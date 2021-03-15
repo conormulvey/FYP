@@ -19,33 +19,37 @@ from sklearn.datasets import load_digits
 
 import pandas as pd
 from emmv import emmv_scores
+import sys
+print('#Hello from python#')
+print('First param:'+sys.argv[1]+'#')
+print('Second param:'+sys.argv[2]+'#')
 
-#Read in dataset
-#First 100 rows
-testset = pd.read_csv('human_activity_raw_sensor_data/sensor_sample_float.csv', nrows=7000,parse_dates=['timestamp'])
+# #Read in dataset
+# #First 100 rows
+# testset = pd.read_csv('human_activity_raw_sensor_data/sensor_sample_float.csv', nrows=7000,parse_dates=['timestamp'])
 
-# print(testset.dtypes)
+# # print(testset.dtypes)
 
-#change timestamp to an int so clf will work
-testset['timestamp'] = pd.to_numeric(testset['timestamp'])
+# #change timestamp to an int so clf will work
+# testset['timestamp'] = pd.to_numeric(testset['timestamp'])
 
-#split the data into training and test sets
-train, test = train_test_split(testset, test_size=0.3)
+# #split the data into training and test sets
+# train, test = train_test_split(testset, test_size=0.3)
 
-#sort the train set by its timestamp
-train = train.sort_values(['timestamp'])
+# #sort the train set by its timestamp
+# train = train.sort_values(['timestamp'])
 
-#use the value and timestamp columns 
-clf = IsolationForest().fit(train[['value','timestamp','sensor_id']])
+# #use the value and timestamp columns 
+# clf = IsolationForest().fit(train[['value','timestamp','sensor_id']])
 
-#use the model to predict the values in the testset
-results = clf.predict(test[['value','timestamp','sensor_id']])
+# #use the model to predict the values in the testset
+# results = clf.predict(test[['value','timestamp','sensor_id']])
 
-test_scores = emmv_scores(clf,test[['value','timestamp','sensor_id']])
+# test_scores = emmv_scores(clf,test[['value','timestamp','sensor_id']])
 
-print(test_scores)
+# print(test_scores)
 
-# create date time features of a dataset
+# # create date time features of a dataset
 # series = pd.read_csv('human_activity_raw_sensor_data/sensor_sample_float.csv',parse_dates=['timestamp'], squeeze=True, nrows=7000)
 
 # print(series.dtypes)

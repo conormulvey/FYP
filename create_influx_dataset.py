@@ -11,16 +11,9 @@ from datetime import datetime
 from influxdb import InfluxDBClient
 import time
 
-# dt = datetime.now()
-# timestamp = time.mktime(dt.timetuple()) + dt.microsecond/1e6
-
-# print(timestamp)
-
-client = InfluxDBClient(host='localhost', port="8086")
+client = InfluxDBClient(host='localhost', port=8086)
 
 client.create_database('pyexample')
-
-print(client.get_list_database())
 
 client.switch_database('pyexample')
 
@@ -28,83 +21,63 @@ testset = pd.read_csv('human_activity_raw_sensor_data/sensor_sample_float.csv', 
 
 for i in range(len(testset)):
     
-    print(pd.to_datetime(testset["timestamp"], unit='ns'))
+    # json_body = [{
+    #     "measurement": "Multiple_sensor_readings",
+    #     "tags": {
+    #         "site_name": "Nans House",
+    #         "asset": "Water resevoir",
+    #       },
+    #     "time": "2018-03-29T8:04:00Z",
+    #     "fields": {
+    #         "value": testset["value"][i],
+    #     }
+    # }]
     
-    json_body = [{
-        "measurement": "Multiple_sensor_readings",
+    json_body = [
+    {
+        "measurement": "brushEvents",
         "tags": {
-            "site_name": "Nans House",
-            "asset": "Water resevoir",
-          },
-
+            "user": "Carol",
+            "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
+        },
+        "time": time.time_ns(),
         "fields": {
-            "value": testset["value"][i],
-            "value_id": testset["value_id"][i],
-            "sensor_id": testset["sensor_id"][i]
+            "duration": 127
         }
-    }]
-    
-    client.write(json_body,protocol='json')
+    },
+    {
+        "measurement": "brushEvents",
+        "tags": {
+            "user": "Carol",
+            "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
+        },
+        "time": time.time_ns(),
+        "fields": {
+            "duration": 132
+        }
+    },
+    {
+        "measurement": "brushEvents",
+        "tags": {
+            "user": "Carol",
+            "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
+        },
+        "time": time.time_ns(),
+        "fields": {
+            "duration": 129
+        }
+    }
+    ]
 
-# json_body = [
-#     {
-#         "measurement": "brushEvents",
-#         "tags": {
-#             "user": "Carol",
-#             "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
-#         },
-#         "time": "2018-03-28T8:01:00Z",
-#         "fields": {
-#             "duration": 127
-#         }
-#     },
-#     {
-#         "measurement": "brushEvents",
-#         "tags": {
-#             "user": "Carol",
-#             "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
-#         },
-#         "time": "2018-03-29T8:04:00Z",
-#         "fields": {
-#             "duration": 132
-#         }
-#     },
-#     {
-#         "measurement": "brushEvents",
-#         "tags": {
-#             "user": "Carol",
-#             "brushId": "6c89f539-71c6-490d-a28d-6c5d84c0ee2f"
-#         },
-#         "time": "2018-03-30T8:02:00Z",
-#         "fields": {
-#             "duration": 129
-#         }
-#     }
-# ]
+print(json_body)
+ 
+client.write_points(json_body)
 
-# print(json_body)
+results = client.query('SELECT * FROM "pyexample"')
 
-# client.write_points(json_body,'test_sensor_data')
+print(results.raw)
 
-# results = client.query('SELECT "sensor_id" FROM "test_sensor_data" WHERE sensor_id = 6222')
+points = results.get_points("Multiple_sensor_readings")
 
-# print(results)
-
-# df = pd.read_csv('human_activity_raw_sensor_data/sensor_sample_float.csv', nrows=10, parse_dates=['timestamp'])
-
-# df['timestamp'] = pd.to_timedelta(df['timestamp'])
-
-# time = df["timestamp"].dt.total_seconds()
-
-# print(time)
-
-
-# lines = [ "price" + ",type=BTC" + " " 
-#          + "value=" + str(df["value_id"][d]) + "," 
-#          + "sensor=" + str(df["sensor_id"][d]) + ","
-#          + "value=" + str(df["value"][d])
-#          + " " + str(df["timestamp"][d]) for d in range(len(df))]
-
-# thefile = open('D:/FYP_V1/chronograf.txt', 'w')
-# for item in lines:
-#     thefile.write("%s\n" % item)
+for point in points:
+    print('point')
